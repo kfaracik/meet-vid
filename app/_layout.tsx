@@ -1,37 +1,78 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Slot, useRouter, useSegments } from "expo-router";
+import "react-native-reanimated";
+import * as SecureStore from "expo-secure-store";
+import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/clerk-expo";
+import { useEffect } from "react";
+import { ActivityIndicator } from "react-native";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+type TokenCache = {
+  getToken: (key: string) => Promise<string | undefined | null>;
+  saveToken: (key: string, token: string) => Promise<void>;
+  clearToken?: (key: string) => void;
+};
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+const tokenCache: TokenCache = {
+  async getToken(key: string) {
+    try {
+      const item = await SecureStore.getItemAsync(key);
+      if (item) {
+        console.log(`${key} was used 🔐 \n`);
+      } else {
+        console.log("No values stored under key: " + key);
+      }
+      return item;
+    } catch (error) {
+      console.error("SecureStore get item error: ", error);
+      await SecureStore.deleteItemAsync(key);
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+if (!publishableKey) {
+  throw new Error(
+    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+  );
+}
+
+const InitialLayout = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    if (!isLoaded) {
+      return;
     }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
+    if (isSignedIn) {
+      router.replace("/home");
+    } else if (!isSignedIn) {
+      router.replace("/sign-in");
+    }
+  }, [isSignedIn]);
+
+  if (!isLoaded) {
+    return <ActivityIndicator />;
   }
 
+  return <Slot />;
+};
+
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <ClerkLoaded>
+        <InitialLayout />
+      </ClerkLoaded>
+    </ClerkProvider>
   );
 }
