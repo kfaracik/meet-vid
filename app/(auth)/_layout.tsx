@@ -1,14 +1,47 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
+import { useAuth } from "@clerk/clerk-expo";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, } from "react-native";
 
 const AuthLayout = () => {
+  const { isSignedIn } = useAuth();
+
+  if (isSignedIn) {
+    return <Redirect href="/home" />;
+  }
+
   return (
-    <Stack>
-      <Stack.Screen name={"sign-in"} />
-      <Stack.Screen name={"sign-up"} />
-    </Stack>
+    <SafeAreaView style={styles.container}>
+      <Stack
+        screenOptions={{
+          headerTintColor: "white",
+          headerTransparent: true,
+        }}
+      >
+        <Stack.Screen
+          name={"sign-in"}
+          options={{
+            title: "Sign In to get started",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={"sign-up"}
+          options={{
+            title: "Create new account",
+          }}
+        />
+      </Stack>
+    </SafeAreaView>
   );
 };
 
 export default AuthLayout;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#5f5dec",
+  },
+});
