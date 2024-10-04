@@ -14,7 +14,7 @@ const InitialLayout = () => {
     }
 
     if (isSignedIn) {
-      router.replace("/home");
+      router.replace("/all-calls");
     } else if (!isSignedIn) {
       router.replace("/sign-in");
     }

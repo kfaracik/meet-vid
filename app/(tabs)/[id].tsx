@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-export const HomeScreen = () => {
+const CallScreen = () => {
   return (
     <View>
-      <Text>home</Text>
+      <Text>create call</Text>
     </View>
   );
 };
 
-export default HomeScreen;
+export default CallScreen;
