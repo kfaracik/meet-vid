@@ -9,3 +9,16 @@ Video Streaming: Real-time video call functionality using GetStream's API.
 Expo Router: Clean, organized routing for navigation.
 Mobile-first design: Designed for smooth performance on iOS and Android devices.
 Secure and Scalable: Secure token management and scalable video streaming infrastructure.
+
+### Tech
+- expo
+- expo-router
+- expo-secure-store
+
+- clerk
+- getStream
+
+- react-native-paper
+- react-native-dialog
+- react-native-permissions
+- react-native-reanimated
