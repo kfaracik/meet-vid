@@ -3,6 +3,8 @@
 ### Overview
 This React Native project is designed to provide a seamless video call experience, integrating authentication with Clerk and video streaming functionality powered by GetStream. The app allows users to sign in, authenticate securely, and participate in live video calls. It leverages Expo Router for navigation, Clerk for authentication, and GetStream for video streaming.
 
+![Demo  auth](https://media.giphy.com/media/pUXmB9iUOlilRb3b79/giphy.gif)
+
 ### Key Features:
 User Authentication: Authentication with Clerk using secure token storage and session management.
 Video Streaming: Real-time video call functionality using GetStream's API.
